@@ -71,3 +71,15 @@ app.post('/book-ticket', (req, res) => {
 app.listen(process.env.PORT || port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+// Assuming you have this in your server code
+app.get('/tickets/:id', (req, res) => {
+  const ticketId = req.params.id;
+  const ticket = tickets.find(t => t.id === ticketId);
+
+  if (ticket) {
+      res.status(200).json(ticket);
+  } else {
+      res.status(404).json({ error: 'Ticket not found' });
+  }
+});
