@@ -5,11 +5,11 @@ const cors = require('cors'); // Import CORS
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Dummy ticket data
+// Dummy ticket data with seat numbers
 let tickets = [
-  { id: 1, from: 'City A', to: 'City B', time: '10:00 AM', seats: 50, remainingSeats: 50, ticketClass: 'Economy', wifi: true, food: false },
-  { id: 2, from: 'City B', to: 'City C', time: '12:00 PM', seats: 30, remainingSeats: 30, ticketClass: 'Business', wifi: true, food: true },
-  { id: 3, from: 'City C', to: 'City A', time: '02:00 PM', seats: 20, remainingSeats: 20, ticketClass: 'First Class', wifi: false, food: true }
+  { id: 1, from: 'City A', to: 'City B', time: '10:00 AM', seats: 50, remainingSeats: 50, ticketClass: 'Economy', wifi: true, food: false, bookedSeats: [] },
+  { id: 2, from: 'City B', to: 'City C', time: '12:00 PM', seats: 30, remainingSeats: 30, ticketClass: 'Business', wifi: true, food: true, bookedSeats: [] },
+  { id: 3, from: 'City C', to: 'City A', time: '02:00 PM', seats: 20, remainingSeats: 20, ticketClass: 'First Class', wifi: false, food: true, bookedSeats: [] }
 ];
 
 // Middleware to parse JSON bodies
@@ -51,7 +51,8 @@ app.post('/tickets', (req, res) => {
       remainingSeats: seats, // Initialize remainingSeats with the total number of seats
       ticketClass: ticketClass,
       wifi: wifi,
-      food: food
+      food: food,
+      bookedSeats: [] // Initialize with no booked seats
     };
     tickets.push(newTicket);
     res.status(201).json({ message: 'Ticket added successfully', ticket: newTicket });
@@ -61,24 +62,30 @@ app.post('/tickets', (req, res) => {
   }
 });
 
-// Book a ticket
-app.post('/book-ticket', (req, res) => {
+// Book a specific seat on a ticket
+app.post('/book-seat', (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, seatNumber } = req.body;
     const ticket = tickets.find(t => t.id === id);
 
     if (!ticket) {
       return res.status(404).json({ error: 'Ticket not found' });
     }
 
-    if (ticket.remainingSeats > 0) {
-      ticket.remainingSeats -= 1;
-      res.status(200).json({ message: 'Ticket booked successfully', ticket: ticket });
-    } else {
-      res.status(400).json({ error: 'No remaining seats available' });
+    if (ticket.bookedSeats.includes(seatNumber)) {
+      return res.status(400).json({ error: 'Seat already booked' });
     }
+
+    if (seatNumber < 1 || seatNumber > ticket.seats) {
+      return res.status(400).json({ error: 'Invalid seat number' });
+    }
+
+    ticket.bookedSeats.push(seatNumber);
+    ticket.remainingSeats -= 1;
+
+    res.status(200).json({ message: 'Seat booked successfully', ticket: ticket });
   } catch (error) {
-    console.error('Error booking ticket:', error);
+    console.error('Error booking seat:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
