@@ -1,7 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors'); // Import CORS
+
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 // Dummy ticket data
 let tickets = [
@@ -12,6 +14,7 @@ let tickets = [
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
+app.use(cors()); // Enable CORS
 
 // Get all tickets
 app.get('/tickets', (req, res) => {
@@ -20,6 +23,18 @@ app.get('/tickets', (req, res) => {
   } catch (error) {
     console.error('Error getting tickets:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get a specific ticket by ID
+app.get('/tickets/:id', (req, res) => {
+  const ticketId = parseInt(req.params.id); // Parse ID as a number
+  const ticket = tickets.find(t => t.id === ticketId);
+
+  if (ticket) {
+    res.status(200).json(ticket);
+  } else {
+    res.status(404).json({ error: 'Ticket not found' });
   }
 });
 
@@ -68,18 +83,6 @@ app.post('/book-ticket', (req, res) => {
   }
 });
 
-app.listen(process.env.PORT || port, () => {
+app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
-});
-
-// Assuming you have this in your server code
-app.get('/tickets/:id', (req, res) => {
-  const ticketId = req.params.id;
-  const ticket = tickets.find(t => t.id === ticketId);
-
-  if (ticket) {
-      res.status(200).json(ticket);
-  } else {
-      res.status(404).json({ error: 'Ticket not found' });
-  }
 });

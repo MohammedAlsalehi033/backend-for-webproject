@@ -4,7 +4,7 @@
   "description": "",
   "main": "imdex.js",
   "scripts": {
-    "live": "nodemon server.js", 
+    "live": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
     "serve": "node index.js",
@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.19.2",
     "mysql2": "^3.9.7"
   }
