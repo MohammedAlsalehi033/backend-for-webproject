@@ -7,9 +7,9 @@ const port = process.env.PORT || 3000;
 
 // Dummy ticket data with seat numbers
 let tickets = [
-  { id: 1, from: 'City A', to: 'City B', time: '10:00 AM', seats: 50, remainingSeats: 50, ticketClass: 'Economy', wifi: true, food: false, bookedSeats: [] },
-  { id: 2, from: 'City B', to: 'City C', time: '12:00 PM', seats: 30, remainingSeats: 30, ticketClass: 'Business', wifi: true, food: true, bookedSeats: [] },
-  { id: 3, from: 'City C', to: 'City A', time: '02:00 PM', seats: 20, remainingSeats: 20, ticketClass: 'First Class', wifi: false, food: true, bookedSeats: [] }
+  { id: 1, from: 'City A', to: 'City B', time: '10:00 AM',data: "20-20-20",fare: 1000, seats: 50, remainingSeats: 50, ticketClass: 'Economy', wifi: true, food: false, bookedSeats: [] },
+  { id: 2, from: 'City B', to: 'City C', time: '12:00 PM',data: "20-20-20",fare: 1000, seats: 30, remainingSeats: 30, ticketClass: 'Business', wifi: true, food: true, bookedSeats: [] },
+  { id: 3, from: 'City C', to: 'City A', time: '02:00 PM',data: "20-20-20",fare: 1000, seats: 20, remainingSeats: 20, ticketClass: 'First Class', wifi: false, food: true, bookedSeats: [] }
 ];
 
 // Middleware to parse JSON bodies
@@ -41,18 +41,20 @@ app.get('/tickets/:id', (req, res) => {
 // Add a new ticket
 app.post('/tickets', (req, res) => {
   try {
-    const { from, to, time, seats, ticketClass, wifi, food } = req.body;
+    const { from, to, time,data,fare, seats, ticketClass, wifi, food } = req.body;
     const newTicket = {
       id: tickets.length + 1,
       from: from,
       to: to,
       time: time,
+      data: data,
+      fare: fare,
       seats: seats,
-      remainingSeats: seats, // Initialize remainingSeats with the total number of seats
+      remainingSeats: seats, 
       ticketClass: ticketClass,
       wifi: wifi,
       food: food,
-      bookedSeats: [] // Initialize with no booked seats
+      bookedSeats: []
     };
     tickets.push(newTicket);
     res.status(201).json({ message: 'Ticket added successfully', ticket: newTicket });
